@@ -1,4 +1,4 @@
-from mymanager import MyManager
+from .mymanager import MyManager
 import time
 import uuid
 import multiprocessing as mp
@@ -7,7 +7,7 @@ from multiprocessing.managers import SyncManager
 import sys
 
 
-class KafkaConsumerLookalike:
+class KafkaConsumer:
     def __init__(self, topic, bootstrap_servers, value_deserializer=None, mode='from_beginning'):
         self.mode = mode
         self.id = uuid.uuid4()
@@ -53,15 +53,3 @@ class KafkaConsumerLookalike:
 
     def __del__(self):
         self.topic_dict.get(self.topic).pop(id)
-
-if __name__ == '__main__':
-    import socket
-    ip = 'localhost'  # socket.gethostbyname(socket.gethostname())
-    port = 40000
-    bootstrap_servers = ip + ':' + str(port)
-
-    kafka_consumer = KafkaConsumerLookalike('time', bootstrap_servers=bootstrap_servers, mode='not_from_beginning')
-
-    for msg in kafka_consumer:
-        # print(msg)
-        print(kafka_consumer.offset)

@@ -1,4 +1,4 @@
-from mymanager import MyManager
+from src.nqkafka.mymanager import MyManager
 
 
 # KafkaConsumerLookalike()

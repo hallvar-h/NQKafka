@@ -1,9 +1,9 @@
-from mymanager import MyManager
+from .mymanager import MyManager
 import time
 import numpy as np
 
 
-class KafkaProducerLookalike:
+class KafkaProducer:
     def __init__(self, bootstrap_servers, value_serializer=None):
 
         ip, port_str = bootstrap_servers.split(':')
@@ -40,20 +40,3 @@ class KafkaProducerLookalike:
 
     def flush(self):
         pass
-
-
-if __name__ == '__main__':
-    import socket
-    ip = 'localhost'  # socket.gethostbyname(socket.gethostname())
-    port = 40000
-    bootstrap_servers = ip + ':' + str(port)
-
-    kafka_producer = KafkaProducerLookalike(bootstrap_servers=bootstrap_servers)  # 'localhost:9092')
-
-    k = 0
-    while True:
-        time.sleep(0.1)
-        k += 0.1
-
-        kafka_producer.send('time', np.random.randn(10))
-        kafka_producer.flush()
