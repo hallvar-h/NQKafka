@@ -34,8 +34,8 @@ class MyManager:
             DictManager.register('get_lock_dict')
 
         self._manager = DictManager(*args, **kwargs)
-        if 'authkey' in kwargs:
-            mp.current_process().authkey = kwargs['authkey']
+        # if 'authkey' in kwargs:
+        mp.current_process().authkey = b'supersecretauthkey'
 
         self.connect = self._manager.connect
         # self.get_init_queue = self._manager.connect

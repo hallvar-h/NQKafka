@@ -8,7 +8,7 @@ class KafkaProducer:
 
         ip, port_str = bootstrap_servers.split(':')
         port = int(port_str)
-        manager = MyManager(address=(ip, port), authkey=b'abracadabra')
+        manager = MyManager(address=(ip, port), authkey=b'supersecretauthkey')
         manager.connect()
         self.shared_dict = manager.get_queue_dict()
         self.offset_dict = manager.get_offset_dict()

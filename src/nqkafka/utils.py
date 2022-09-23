@@ -6,7 +6,7 @@ def create_topic(topic, bootstrap_servers, n_samples):
 
     ip, port_str = bootstrap_servers.split(':')
     port = int(port_str)
-    manager = MyManager(address=(ip, port), authkey=b'abracadabra')
+    manager = MyManager(address=(ip, port), authkey=b'supersecretauthkey')
     manager.connect()
 
     data_dict = manager.get_queue_dict()
@@ -31,4 +31,4 @@ if __name__ == '__main__':
     port = 40000
     bootstrap_servers = ip + ':' + str(port)
 
-    create_topic('time', bootstrap_servers=bootstrap_servers, n_samples=50)
+    create_topic('some_topic', bootstrap_servers=bootstrap_servers, n_samples=50)

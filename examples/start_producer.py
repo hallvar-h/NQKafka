@@ -4,12 +4,8 @@ import time
 
 
 if __name__ == '__main__':
-    import socket
-    ip = 'localhost'  # socket.gethostbyname(socket.gethostname())
-    port = 40000
-    bootstrap_servers = ip + ':' + str(port)
 
-    kafka_producer = KafkaProducer(bootstrap_servers=bootstrap_servers)  # 'localhost:9092')
+    kafka_producer = KafkaProducer(bootstrap_servers='localhost:40000')  # 'localhost:9092')
 
     k = 0
     while True:
