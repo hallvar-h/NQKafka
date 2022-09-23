@@ -1,5 +1,6 @@
 from mymanager import MyManager
 import time
+import numpy as np
 
 
 class KafkaProducerLookalike:
@@ -10,21 +11,32 @@ class KafkaProducerLookalike:
         manager = MyManager(address=(ip, port), authkey=b'abracadabra')
         manager.connect()
         self.shared_dict = manager.get_queue_dict()
+        self.offset_dict = manager.get_offset_dict()
         self.topic_dict = manager.get_event_dict()
+        self.lock_dict = manager.get_lock_dict()
 
     def send(self, topic, msg):
-        self.shared_dict.update([(topic, msg)])
-        mark_for_deletion = []
-        for consumer_id, event in self.topic_dict.get(topic).items():
-            if event.is_set():
-                mark_for_deletion.append(consumer_id)
-            else:
+        with self.lock_dict.get(topic):
+            data = self.shared_dict.get(topic)
+            data.pop(0)
+            data.append(msg)
+            offset = self.offset_dict.get(topic) + 1
+            self.offset_dict.update([(topic, offset)])
+            # print(data, offset)
+            print(self.topic_dict.get(topic))
+
+            for consumer_id, event in self.topic_dict.get(topic).items():
                 event.set()
+        # mark_for_deletion = []
 
-        for id in mark_for_deletion:
-            self.topic_dict.get(topic).pop(id)
+        #     if event.is_set():
+        #         mark_for_deletion.append(consumer_id)
+        #     else:
 
-        print(self.topic_dict.get(topic))
+        # for id in mark_for_deletion:
+        #     self.topic_dict.get(topic).pop(id)
+        #
+        # print(self.topic_dict.get(topic))
 
     def flush(self):
         pass
@@ -40,8 +52,8 @@ if __name__ == '__main__':
 
     k = 0
     while True:
-        # time.sleep(0.1)
-        k += 0.02
+        time.sleep(0.1)
+        k += 0.1
 
-        kafka_producer.send('time', k)
+        kafka_producer.send('time', np.random.randn(10))
         kafka_producer.flush()
