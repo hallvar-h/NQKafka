@@ -8,7 +8,7 @@ if __name__ == '__main__':
     import socket
 
     hostname = socket.gethostname()
-    ip = socket.gethostbyname(hostname)
+    ip = 'localhost'  # socket.gethostbyname(hostname)
     port = 40000
     qm_kwargs = dict(address=(ip, port), authkey=b'abracadabra')
 
