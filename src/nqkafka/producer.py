@@ -8,7 +8,7 @@ class KafkaProducer:
 
         ip, port_str = bootstrap_servers.split(':')
         port = int(port_str)
-        manager = MyManager(address=(ip, port), authkey=b'supersecretauthkey')
+        manager = MyManager(address=(ip, port))  # , authkey=b'supersecretauthkey')
         manager.connect()
         self.shared_dict = manager.get_queue_dict()
         self.offset_dict = manager.get_offset_dict()
@@ -20,13 +20,17 @@ class KafkaProducer:
             data = self.shared_dict.get(topic)
             data.pop(0)
             data.append(msg)
+            # print(data)
             offset = self.offset_dict.get(topic) + 1
+
             self.offset_dict.update([(topic, offset)])
             # print(data, offset)
-            print(self.topic_dict.get(topic))
+            # print(self.topic_dict.get(topic))
 
             for consumer_id, event in self.topic_dict.get(topic).items():
+                # time.sleep(0.1)
                 event.set()
+
         # mark_for_deletion = []
 
         #     if event.is_set():

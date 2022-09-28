@@ -3,7 +3,7 @@ from multiprocessing.managers import SyncManager
 
 
 class MyManager:
-    def __init__(self, server=False, *args, **kwargs):
+    def __init__(self, server=False, authkey=b'supersecretauthkey', *args, **kwargs):
         class DictManager(SyncManager):
             pass
 
@@ -33,9 +33,9 @@ class MyManager:
             DictManager.register('get_offset_dict')
             DictManager.register('get_lock_dict')
 
-        self._manager = DictManager(*args, **kwargs)
+        self._manager = DictManager(authkey=authkey, *args, **kwargs)
         # if 'authkey' in kwargs:
-        mp.current_process().authkey = b'supersecretauthkey'
+        mp.current_process().authkey = authkey
 
         self.connect = self._manager.connect
         # self.get_init_queue = self._manager.connect
