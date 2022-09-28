@@ -1,4 +1,4 @@
-from src.nqkafka import KafkaProducer, KafkaConsumer
+from nqkafka import KafkaProducer, KafkaConsumer
 import numpy as np
 import time
 

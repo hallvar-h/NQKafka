@@ -1,4 +1,4 @@
-from src.nqkafka.producer import KafkaProducer
+from nqkafka.producer import KafkaProducer
 import numpy as np
 import time
 import sys

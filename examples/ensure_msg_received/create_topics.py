@@ -1,4 +1,4 @@
-from src.nqkafka.utils import create_topic
+from nqkafka.utils import create_topic
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-from src.nqkafka import KafkaConsumer
+from nqkafka import KafkaConsumer
 
 
 if __name__ == '__main__':

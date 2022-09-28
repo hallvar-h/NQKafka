@@ -1,4 +1,4 @@
-from src.nqkafka.server import NQKafkaServer
+from nqkafka.server import NQKafkaServer
 
 
 if __name__ == '__main__':
