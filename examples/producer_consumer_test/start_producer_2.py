@@ -12,5 +12,6 @@ if __name__ == '__main__':
         time.sleep(1)
         k += 0.1
 
-        kafka_producer.send('time', np.random.randn(10))
+        payload = [1, 2, 3]
+        kafka_producer.send('time', payload)
         kafka_producer.flush()

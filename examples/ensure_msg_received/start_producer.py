@@ -1,8 +1,5 @@
 from nqkafka.producer import KafkaProducer
-import numpy as np
 import time
-import sys
-
 
 if __name__ == '__main__':
 
@@ -10,10 +7,9 @@ if __name__ == '__main__':
 
     k = 0
     while True:
-        sys.stdout
-        # time.sleep(1)
+        time.sleep(0.1)
 
-        payload = np.random.randn(10)
+        payload = [1, 2, 3]
         kafka_producer.send('time', [time.time(), k, payload])
         kafka_producer.flush()
         k += 1

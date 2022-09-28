@@ -15,4 +15,3 @@ if __name__ == '__main__':
         else:
             sys.stdout.write('\rCorrect message received (#{}). Delay: {:.1f} ms.'.format(k, 1e3*(time.time() - t_send)))
         k += 1
-        # print(kafka_consumer.offset)

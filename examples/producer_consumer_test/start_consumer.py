@@ -7,4 +7,3 @@ if __name__ == '__main__':
 
     for msg in kafka_consumer:
         print(kafka_consumer.offset, msg.value)
-        # print(kafka_consumer.offset)
