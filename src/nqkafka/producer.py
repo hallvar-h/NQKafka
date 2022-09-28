@@ -1,6 +1,4 @@
 from .mymanager import MyManager
-import time
-import numpy as np
 
 
 class KafkaProducer:
