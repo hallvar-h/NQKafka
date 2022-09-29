@@ -14,6 +14,7 @@ class KafkaProducer:
         self.lock_dict = manager.get_lock_dict()
 
     def send(self, topic, msg):
+        # self.queue.put([topic, msg])
         with self.lock_dict.get(topic):
             data = self.shared_dict.get(topic)
             data.append(msg)
