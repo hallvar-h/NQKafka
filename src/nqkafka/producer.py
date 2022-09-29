@@ -16,8 +16,8 @@ class KafkaProducer:
     def send(self, topic, msg):
         with self.lock_dict.get(topic):
             data = self.shared_dict.get(topic)
-            data.pop(0)
             data.append(msg)
+            data.pop(0)
             # print(data)
             offset = self.offset_dict.get(topic) + 1
 

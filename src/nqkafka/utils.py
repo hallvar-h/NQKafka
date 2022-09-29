@@ -2,7 +2,7 @@ from .mymanager import MyManager
 from multiprocessing.managers import SyncManager
 
 
-def create_topic(topic, bootstrap_servers, n_samples):
+def create_topic(name, bootstrap_servers, n_samples=10):
 
     ip, port_str = bootstrap_servers.split(':')
     port = int(port_str)
@@ -20,10 +20,10 @@ def create_topic(topic, bootstrap_servers, n_samples):
     for _ in range(n_samples):
         data_list.append(None)
 
-    topic_dict.update([(topic, consumer_dict)])
-    data_dict.update([(topic, data_list)])
-    offset_dict.update([(topic, 0)])
-    lock_dict.update([(topic, topic_lock)])
+    topic_dict.update([(name, consumer_dict)])
+    data_dict.update([(name, data_list)])
+    offset_dict.update([(name, 0)])
+    lock_dict.update([(name, topic_lock)])
 
 
 if __name__ == '__main__':

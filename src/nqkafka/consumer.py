@@ -19,6 +19,8 @@ class KafkaConsumer:
         self.offset_dict = manager.get_offset_dict()
         self.lock_dict = manager.get_lock_dict()
 
+        self.has_lock = False
+
         self.n_msg_topic = len(self.shared_dict.get(topic))
 
         self.offset = 0
@@ -35,8 +37,11 @@ class KafkaConsumer:
 
     def __iter__(self):
         with self.lock_dict.get(self.topic):
+            self.has_lock = True
             topic_offset = self.offset_dict.get(self.topic)
             self.event.clear()
+        self.has_lock = False
+
         if self.mode == 'from_beginning':
             self.offset = max(0, topic_offset - self.n_msg_topic)
         else:
@@ -47,7 +52,10 @@ class KafkaConsumer:
         keep_waiting = True
         while keep_waiting:
             with self.lock_dict.get(self.topic):
+                self.has_lock = True
                 topic_offset = self.offset_dict.get(self.topic)
+            self.has_lock = False
+
             if self.offset >= topic_offset:
                 # print('Waiting')
                 self.event.wait(timeout=None)
@@ -56,6 +64,7 @@ class KafkaConsumer:
                 keep_waiting = False
 
         with self.lock_dict.get(self.topic):
+            self.has_lock = True
             topic_offset = self.offset_dict.get(self.topic)
             idx = self.offset - topic_offset + self.n_msg_topic
             # print('idx={}, consumer offset={}, producer offset={}, n_msgs={}'.format(idx, self.offset, topic_offset, self.n_msg_topic))
@@ -63,8 +72,11 @@ class KafkaConsumer:
                 print('Error: Index out of range. idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.n_msg_topic, self.offset, topic_offset, topic_offset))
                 msg = None
             else:
-                msg = self.shared_dict.get(self.topic)[idx]
-
+                try:
+                    msg = self.shared_dict.get(self.topic)[idx]
+                except IndexError:
+                    print('IndexError: Index out of range. idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.n_msg_topic, self.offset, topic_offset, topic_offset))
+        self.has_lock = False
 
         # if idx >= self.n_msg_topic:
         #     print(idx, self.offset, self.offset_dict.get(self.topic), self.n_msg_topic)
@@ -78,6 +90,7 @@ class KafkaConsumer:
 
     def __del__(self):
         print('Consumer stopped')
-        self.lock_dict.get(self.topic).release()
+        if self.has_lock:
+            self.lock_dict.get(self.topic).release()
         # super().__del__()
         # self.topic_dict.get(self.topic).pop(id)
