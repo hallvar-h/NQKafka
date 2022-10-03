@@ -1,5 +1,6 @@
+from ensurepip import bootstrap
 from nqkafka import NQKafkaServer, KafkaProducer, KafkaConsumer
-from nqkafka.utils import create_topic
+from nqkafka.utils import create_topic, stop_server
 import multiprocessing as mp
 import sys
 import time
@@ -62,4 +63,9 @@ if __name__ == '__main__':
 
     p_consumer.join()
     p_producer.join()
+
+    from multiprocessing.managers import dispatch,listener_client
+
+    stop_server(bootstrap_servers)
+
     sys.exit()

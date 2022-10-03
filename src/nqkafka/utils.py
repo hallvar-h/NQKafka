@@ -1,5 +1,6 @@
 from .mymanager import MyManager
 from multiprocessing.managers import SyncManager
+from multiprocessing.managers import dispatch,listener_client
 
 
 def create_topic(name, bootstrap_servers, n_samples=10):
@@ -24,6 +25,18 @@ def create_topic(name, bootstrap_servers, n_samples=10):
     data_dict.update([(name, data_list)])
     offset_dict.update([(name, 0)])
     lock_dict.update([(name, topic_lock)])
+
+
+def stop_server(bootstrap_servers, authkey=b'supersecretauthkey'):
+    ip, port_str = bootstrap_servers.split(':')
+    port = int(port_str)
+
+    # From stackoverflow:
+    # https://stackoverflow.com/questions/44940164/stopping-a-python-multiprocessing-basemanager-serve-forever-server
+    _Client = listener_client['pickle'][1]
+    conn = _Client(address=(ip, port), authkey=authkey)
+    dispatch(conn, None, 'shutdown')
+    conn.close()
 
 
 if __name__ == '__main__':
