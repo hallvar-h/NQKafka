@@ -1,5 +1,6 @@
 import multiprocessing as mp
 from multiprocessing.managers import SyncManager
+import queue
 
 
 class MyManager:
@@ -8,30 +9,21 @@ class MyManager:
             pass
 
         if server:
-            queue_dict = dict()
-            event_dict = dict()
-            offset_dict = dict()
-            lock_dict = dict()
-            def get_queue_dict():
-                return queue_dict
+            init_queue = queue.Queue()
+            
+            def get_init_queue():
+                return init_queue
 
-            def get_event_dict():
-                return event_dict
+            producer_queue = queue.Queue()
+            
+            def get_producer_queue():
+                return producer_queue
 
-            def get_offset_dict():
-                return offset_dict
-
-            def get_lock_dict():
-                return lock_dict
-            DictManager.register('get_queue_dict', callable=get_queue_dict)
-            DictManager.register('get_event_dict', callable=get_event_dict)
-            DictManager.register('get_offset_dict', callable=get_offset_dict)
-            DictManager.register('get_lock_dict', callable=get_lock_dict)
+            DictManager.register('get_init_queue', callable=get_init_queue)
+            DictManager.register('get_producer_queue', callable=get_producer_queue)
         else:
-            DictManager.register('get_queue_dict')
-            DictManager.register('get_event_dict')
-            DictManager.register('get_offset_dict')
-            DictManager.register('get_lock_dict')
+            DictManager.register('get_init_queue')
+            DictManager.register('get_producer_queue')
 
         self._manager = DictManager(authkey=authkey, *args, **kwargs)
         # if 'authkey' in kwargs:
@@ -40,10 +32,24 @@ class MyManager:
         self.connect = self._manager.connect
         # self.get_init_queue = self._manager.connect
         [setattr(self, attr, getattr(self._manager, attr)) for attr in [
-            'connect', 'get_queue_dict', 'get_event_dict', 'get_offset_dict', 'get_lock_dict'
+            'connect', 'get_init_queue', 'get_producer_queue', 'Queue'
         ]]
 
     def start(self):
         s = self._manager.get_server()
         print('Serving forever...')
         s.serve_forever()
+
+
+"""
+On produce:
+data.append(msg)
+data.pop(0)
+# print(data)
+offset = self.offset_dict.get(topic) + 1
+self.offset_dict.update([(topic, offset)])
+
+for consumer_id, event in self.topic_dict.get(topic).items():
+# time.sleep(0.1)
+event.set()
+"""

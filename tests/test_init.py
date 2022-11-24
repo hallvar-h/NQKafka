@@ -14,18 +14,18 @@ def run_server(bootstrap_servers):
 def run_consumer(bootstrap_servers, n_msgs):
     kafka_consumer = KafkaConsumer('time', bootstrap_servers=bootstrap_servers, mode='from_beginning')
 
-    k = 0
-    msg_gen = iter(kafka_consumer)
-    while k < n_msgs:
-        msg = next(msg_gen)
-        t_send, k_prod, payload = msg.value
-        if not k == k_prod:
-            print('Wrong message received!')
-        else:
-            sys.stdout.write('\rCorrect message received (#{}). Delay: {:.1f} ms.'.format(k, 1e3*(time.time() - t_send)))
-        k += 1
+    # k = 0
+    # msg_gen = iter(kafka_consumer)
+    # while k < n_msgs:
+    #     msg = next(msg_gen)
+    #     t_send, k_prod, payload = msg.value
+    #     if not k == k_prod:
+    #         print('Wrong message received!')
+    #     else:
+    #         sys.stdout.write('\rCorrect message received (#{}). Delay: {:.1f} ms.'.format(k, 1e3*(time.time() - t_send)))
+    #     k += 1
 
-    print('\nCONSUMER: All messages received')
+    # print('\nCONSUMER: All messages received')
 
 
 def run_producer(bootstrap_servers, n_msgs):
@@ -40,7 +40,7 @@ def run_producer(bootstrap_servers, n_msgs):
         kafka_producer.flush()
         k += 1
 
-    print('\nPRODUCER: All messages sent')
+    # print('\nPRODUCER: All messages sent')
 
 
 
@@ -64,6 +64,8 @@ if __name__ == '__main__':
     p_consumer.join()
     p_producer.join()
 
+    print('Finishing')
+    time.sleep(2)
     stop_server(bootstrap_servers)
 
     sys.exit()
