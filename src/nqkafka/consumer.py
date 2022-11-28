@@ -16,8 +16,9 @@ class KafkaConsumer:
 
         self.init_queue = manager.get_init_queue()
         self.input_stream = manager.Queue()
-        # self.recv_event = manager.Event()
-        self.init_queue.put(['consumer', self.id, topic, self.input_stream, mode])
+        self.recv_event = manager.Event()
+        self.recv_event.clear()
+        self.init_queue.put(['consumer', self.id, topic, self.input_stream, self.recv_event, mode])
         
         
         # self.n_msg_topic = len(self.shared_dict.get(topic))
@@ -42,9 +43,9 @@ class KafkaConsumer:
 
     def __next__(self):
         
-        
         # msg = self.input_queue.get()
         self.offset, msg = self.input_stream.get()
+        self.recv_event.set()
         # self.input_stream.put(self.offset)
         
         kafka_msg = type('KafkaMsg', (), {'value': msg})

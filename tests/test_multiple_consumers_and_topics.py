@@ -48,7 +48,7 @@ def run_producer(topic, bootstrap_servers, n_msgs):
 if __name__ == '__main__':
     bootstrap_servers = 'localhost:40001'
 
-    n_msgs = 2000
+    n_msgs = 50
 
     p_server = mp.Process(target=run_server, args=(bootstrap_servers,))
     p_server.start()
@@ -62,6 +62,8 @@ if __name__ == '__main__':
     p_consumers = {}
     p_producers = {}
     n_consumers = 3
+
+    time.sleep(1)
 
     for topic in topics:
         p_consumers[topic] = []

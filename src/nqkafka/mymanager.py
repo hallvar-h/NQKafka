@@ -32,7 +32,7 @@ class MyManager:
         self.connect = self._manager.connect
         # self.get_init_queue = self._manager.connect
         [setattr(self, attr, getattr(self._manager, attr)) for attr in [
-            'connect', 'get_init_queue', 'get_producer_queue', 'Queue'
+            'connect', 'get_init_queue', 'get_producer_queue', 'Queue', 'Event',
         ]]
 
     def start(self):

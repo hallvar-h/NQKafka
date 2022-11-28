@@ -37,6 +37,25 @@ def stop_server(bootstrap_servers, authkey=b'supersecretauthkey'):
     conn.close()
 
 
+def get_last_message_from_topic(bootstrap_servers, topic):
+    ip, port_str = bootstrap_servers.split(':')
+    port = int(port_str)
+    manager = MyManager(address=(ip, port))  # , authkey=b'supersecretauthkey')
+    manager.connect()
+
+    init_queue = manager.get_init_queue()
+    input_stream = manager.Queue()
+    recv_event = manager.Event()
+    recv_event.clear()
+    init_queue.put(['get_last_msg', topic, input_stream, recv_event])
+    
+    msg = input_stream.get()
+    recv_event.set()
+    kafka_msg = type('KafkaMsg', (), {'value': msg})
+    return kafka_msg.value  # self.offset]
+    
+
+
 if __name__ == '__main__':
     ip = 'localhost'  # socket.gethostbyname(socket.gethostname())
     port = 40000

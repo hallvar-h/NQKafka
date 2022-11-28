@@ -34,7 +34,8 @@ class NQKafkaServer:
                 id = msg[1]
                 topic_name = msg[2]
                 consumer_queue = msg[3]
-                mode = msg[4]
+                consumer_recv_event = msg[4]
+                mode = msg[5]
 
                 if not topic_name in self.topic_list:
                     print('"{}" is not a registered topic.'.format(topic_name))
@@ -53,9 +54,30 @@ class NQKafkaServer:
                     consumer_offset = topic_offset
                 # self.consumers[topic_name].append((consumer_offset, consumer_queue))
 
-                new_consumer_server_thread = threading.Thread(target=self.serve_consumer, args=(topic_name, consumer_offset, consumer_queue, notifyer_event))
+                new_consumer_server_thread = threading.Thread(target=self.serve_consumer, args=(topic_name, consumer_offset, consumer_queue, consumer_recv_event, notifyer_event))
                 new_consumer_server_thread.start()
                 # self.consumer_servers.append()
+
+            if msg[0] == 'get_last_msg':
+                topic_name = msg[1]
+                consumer_queue = msg[2]
+                consumer_recv_event = msg[3]
+
+                if not topic_name in self.topic_list:
+                    print('"{}" is not a registered topic.'.format(topic_name))
+                    break
+
+                topic_offset = self.offsets[topic_name]
+                msg = self.data[topic_name][-1]  # .copy()
+                consumer_queue.put(msg)  # self.offset]
+                consumer_recv_event.wait()
+                print(f'Single most recent message was delivered from topic {topic_name}, offset {topic_offset}.')
+                # self.consumers[topic_name].append((consumer_offset, consumer_queue))
+
+                # new_consumer_server_thread = threading.Thread(target=self.serve_consumer, args=(topic_name, consumer_offset, consumer_queue, consumer_recv_event, notifyer_event))
+                # new_consumer_server_thread.start()
+                # self.consumer_servers.append()
+
                 
                 
             elif msg[0] == 'new_topic':
@@ -77,7 +99,7 @@ class NQKafkaServer:
             # print(new_consumer_msg)
             # break
 
-    def serve_consumer(self, topic_name, consumer_offset, consumer_queue, consumer_event):
+    def serve_consumer(self, topic_name, consumer_offset, consumer_queue, consumer_recv_event, consumer_event):
         while True:
             keep_waiting = True
             while keep_waiting:
@@ -98,7 +120,7 @@ class NQKafkaServer:
                     msg = None
                 else:
                     try:
-                        msg = self.data[topic_name][idx].copy()
+                        msg = self.data[topic_name][idx]  # .copy()
                     except IndexError:
                         print('IndexError: Index out of range.')  #  idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.n_msg_topic, self.offset, topic_offset, topic_offset))
 
@@ -107,12 +129,14 @@ class NQKafkaServer:
             #     msg = self.shared_dict.get(self.topic)[idx - 1]
             # else:
             # print(msg)
-
-            consumer_offset += 1
             
-            consumer_queue.put([consumer_offset, msg])  # self.offset]
+            consumer_queue.put([consumer_offset + 1, msg])  # self.offset]
+
+            consumer_recv_event.wait()
+            consumer_offset += 1
 
     def msg_listener(self):
+        print('Start listening for messages.')
         msg_queue = self.manager.get_producer_queue()
         while True:
             # print('Waiting for messages...')
@@ -130,6 +154,7 @@ class NQKafkaServer:
                 self.offsets[topic] = self.offsets[topic] + 1
             # print(self.offsets)
             # print(self.data)
+            # print(topic, msg)
 
             for consumer_id, event in self.consumer_thread_notifyers[topic].items():
                 event.set()
@@ -146,6 +171,7 @@ class NQKafkaServer:
 
     def start(self):
         self.server_process.start()
+        time.sleep(1)
         self.manager = MyManager(address=(self.ip, self.port))  # , authkey=b'supersecretauthkey')
         self.manager.connect()  
 
