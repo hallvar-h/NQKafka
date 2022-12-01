@@ -64,8 +64,6 @@ if __name__ == '__main__':
     p_consumer.join()
     p_producer.join()
 
-    from multiprocessing.managers import dispatch,listener_client
-
     stop_server(bootstrap_servers)
 
     sys.exit()

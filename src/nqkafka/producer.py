@@ -8,37 +8,15 @@ class KafkaProducer:
         port = int(port_str)
         manager = MyManager(address=(ip, port))  # , authkey=b'supersecretauthkey')
         manager.connect()
-        self.shared_dict = manager.get_queue_dict()
-        self.offset_dict = manager.get_offset_dict()
-        self.topic_dict = manager.get_event_dict()
-        self.lock_dict = manager.get_lock_dict()
+
+        self.producer_queue = manager.get_producer_queue()
+
+        # self.output_stream = manager.Queue()
+        # self.init_queue.put('producer', self.output_stream)
 
     def send(self, topic, msg):
-        with self.lock_dict.get(topic):
-            data = self.shared_dict.get(topic)
-            data.append(msg)
-            data.pop(0)
-            # print(data)
-            offset = self.offset_dict.get(topic) + 1
+        self.producer_queue.put([topic, msg])
 
-            self.offset_dict.update([(topic, offset)])
-            # print(data, offset)
-            # print(self.topic_dict.get(topic))
-
-            for consumer_id, event in self.topic_dict.get(topic).items():
-                # time.sleep(0.1)
-                event.set()
-
-        # mark_for_deletion = []
-
-        #     if event.is_set():
-        #         mark_for_deletion.append(consumer_id)
-        #     else:
-
-        # for id in mark_for_deletion:
-        #     self.topic_dict.get(topic).pop(id)
-        #
-        # print(self.topic_dict.get(topic))
 
     def flush(self):
         pass
