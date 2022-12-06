@@ -171,7 +171,7 @@ class NQKafkaServer:
 
     def start(self):
         self.server_process.start()
-        time.sleep(1)
+        time.sleep(2)
         self.manager = MyManager(address=(self.ip, self.port))  # , authkey=b'supersecretauthkey')
         self.manager.connect()  
 
