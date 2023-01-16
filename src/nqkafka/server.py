@@ -71,7 +71,7 @@ class NQKafkaServer:
                 msg = self.data[topic_name][-1]  # .copy()
                 consumer_queue.put(msg)  # self.offset]
                 consumer_recv_event.wait()
-                print(f'Single most recent message was delivered from topic {topic_name}, offset {topic_offset}.')
+                # print(f'Single most recent message was delivered from topic {topic_name}, offset {topic_offset}.')
                 # self.consumers[topic_name].append((consumer_offset, consumer_queue))
 
                 # new_consumer_server_thread = threading.Thread(target=self.serve_consumer, args=(topic_name, consumer_offset, consumer_queue, consumer_recv_event, notifyer_event))
