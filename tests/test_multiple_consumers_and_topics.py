@@ -49,19 +49,19 @@ if __name__ == '__main__':
     bootstrap_servers = 'localhost:40001'
 
     n_msgs = 50
+    n_topics = 10
+    n_consumers = 3
 
     p_server = mp.Process(target=run_server, args=(bootstrap_servers,))
     p_server.start()
-
-    
-    n_topics = 10
+   
     topics = [f'topic {i}' for i in range(n_topics)]
     for topic in topics:
         create_topic(topic, bootstrap_servers=bootstrap_servers, n_samples=50)
 
     p_consumers = {}
     p_producers = {}
-    n_consumers = 3
+    
 
     time.sleep(1)
 
