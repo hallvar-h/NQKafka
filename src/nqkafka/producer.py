@@ -2,7 +2,7 @@ from .mymanager import MyManager
 
 
 class KafkaProducer:
-    def __init__(self, bootstrap_servers, value_serializer=None):
+    def __init__(self, bootstrap_servers, value_serializer=None, *args, **kwargs):
 
         ip, port_str = bootstrap_servers.split(':')
         port = int(port_str)

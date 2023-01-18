@@ -5,7 +5,7 @@ import sys
 
 
 class KafkaConsumer:
-    def __init__(self, topic, bootstrap_servers, value_deserializer=None, mode='not_from_beginning'):
+    def __init__(self, topic, bootstrap_servers, value_deserializer=None, mode='not_from_beginning', *args, **kwargs):
         self.mode = mode
         self.id = uuid.uuid4()
         self.topic = topic
