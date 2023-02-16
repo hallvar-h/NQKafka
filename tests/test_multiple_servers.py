@@ -46,25 +46,33 @@ def run_producer(bootstrap_servers, n_msgs):
 
 
 if __name__ == '__main__':
-    bootstrap_servers = 'localhost:40001'
-
     n_msgs = 20
+    p_consumers = []
+    p_producers = []
+    servers = ['localhost:40001', 'localhost:40002']
+    for bootstrap_servers in servers:
+        p_server = mp.Process(target=run_server, args=(bootstrap_servers,))
+        p_server.start()
 
-    p_server = mp.Process(target=run_server, args=(bootstrap_servers,))
-    p_server.start()
+    time.sleep(5)
+    for bootstrap_servers in servers:
 
-    create_topic('time', bootstrap_servers=bootstrap_servers, n_samples=50)
-    time.sleep(2)
+        create_topic('time', bootstrap_servers=bootstrap_servers, n_samples=50)
+        time.sleep(2)
 
-    p_consumer = mp.Process(target=run_consumer, args=(bootstrap_servers, n_msgs,))
-    p_consumer.start()
+        p_c = mp.Process(target=run_consumer, args=(bootstrap_servers, n_msgs,))
+        p_c.start()
+        p_consumers.append(p_c)
 
-    p_producer = mp.Process(target=run_producer, args=(bootstrap_servers, n_msgs,))
-    p_producer.start()
+        p_p = mp.Process(target=run_producer, args=(bootstrap_servers, n_msgs,))
+        p_p.start()
+        p_producers.append(p_p)
 
-    p_consumer.join()
-    p_producer.join()
+    for p in [p_consumers, p_producers]:
+        for p_ in p:
+            p_.join()
 
-    stop_server(bootstrap_servers)
+    for bootstrap_servers in servers:
+        stop_server(bootstrap_servers)
 
     sys.exit()
