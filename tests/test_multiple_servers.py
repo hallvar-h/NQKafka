@@ -51,8 +51,8 @@ if __name__ == '__main__':
     p_producers = []
     servers = ['localhost:40001', 'localhost:40002']
     for bootstrap_servers in servers:
-        p_server = mp.Process(target=run_server, args=(bootstrap_servers,))
-        p_server.start()
+        run_server(bootstrap_servers)
+        
 
     time.sleep(5)
     for bootstrap_servers in servers:

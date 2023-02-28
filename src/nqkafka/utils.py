@@ -13,17 +13,6 @@ def create_topic(name, bootstrap_servers, n_samples=10):
     init_queue = manager.get_init_queue()
     init_queue.put(['new_topic', name, n_samples])
 
-    # consumer_dict = SyncManager.dict(manager._manager)
-    # data_list = SyncManager.list(manager._manager)
-    # topic_lock = SyncManager.Lock(manager._manager)
-    # for _ in range(n_samples):
-        # data_list.append(None)
-
-    # topic_dict.update([(name, consumer_dict)])
-    # data_dict.update([(name, data_list)])
-    # offset_dict.update([(name, 0)])
-    # lock_dict.update([(name, topic_lock)])
-
 
 def stop_server(bootstrap_servers, authkey=b'supersecretauthkey'):
     ip, port_str = bootstrap_servers.split(':')

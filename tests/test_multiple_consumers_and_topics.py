@@ -52,8 +52,8 @@ if __name__ == '__main__':
     n_topics = 10
     n_consumers = 3
 
-    p_server = mp.Process(target=run_server, args=(bootstrap_servers,))
-    p_server.start()
+    run_server(bootstrap_servers)
+
    
     topics = [f'topic {i}' for i in range(n_topics)]
     for topic in topics:

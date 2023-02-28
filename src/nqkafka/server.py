@@ -17,8 +17,8 @@ class NQKafkaServer:
         
         self.server_process = mp.Process(target=self.start_server, args=(self.ip, self.port,))
 
-        self.consumer_listener_thread = threading.Thread(target=self.consumer_listener)
-        self.msg_listener_thread = threading.Thread(target=self.msg_listener)
+        self.consumer_listener_thread = threading.Thread(target=self.consumer_listener, daemon=True)
+        self.msg_listener_thread = threading.Thread(target=self.msg_listener, daemon=True)
 
     def consumer_listener(self):
         init_queue = self.manager.get_init_queue()
@@ -54,7 +54,7 @@ class NQKafkaServer:
                     consumer_offset = topic_offset
                 # self.consumers[topic_name].append((consumer_offset, consumer_queue))
 
-                new_consumer_server_thread = threading.Thread(target=self.serve_consumer, args=(topic_name, consumer_offset, consumer_queue, consumer_recv_event, notifyer_event))
+                new_consumer_server_thread = threading.Thread(target=self.serve_consumer, args=(topic_name, consumer_offset, consumer_queue, consumer_recv_event, notifyer_event), daemon=True)
                 new_consumer_server_thread.start()
                 # self.consumer_servers.append()
 

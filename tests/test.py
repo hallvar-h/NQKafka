@@ -49,9 +49,7 @@ if __name__ == '__main__':
     bootstrap_servers = 'localhost:40001'
 
     n_msgs = 20
-
-    p_server = mp.Process(target=run_server, args=(bootstrap_servers,))
-    p_server.start()
+    run_server(bootstrap_servers)
 
     create_topic('time', bootstrap_servers=bootstrap_servers, n_samples=50)
     time.sleep(2)
