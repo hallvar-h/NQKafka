@@ -1,6 +1,7 @@
 import multiprocessing as mp
 from multiprocessing.managers import SyncManager
 import queue
+import time
 
 
 class MyManager:
@@ -29,16 +30,26 @@ class MyManager:
         # if 'authkey' in kwargs:
         mp.current_process().authkey = authkey
 
-        self.connect = self._manager.connect
+        # self.connect = self._manager.connect
         # self.get_init_queue = self._manager.connect
         [setattr(self, attr, getattr(self._manager, attr)) for attr in [
-            'connect', 'get_init_queue', 'get_producer_queue', 'Queue', 'Event',
+            'get_init_queue', 'get_producer_queue', 'Queue', 'Event',
         ]]
 
     def start(self):
         s = self._manager.get_server()
         print('Serving forever...')
         s.serve_forever()
+
+    def connect(self, timeout=10):
+        t_0 = time.time()
+        while time.time() - t_0 < timeout:
+            try:
+                print('Trying to connect...')
+                self._manager.connect()
+            except:
+                print('Server not found, trying again...')
+                time.sleep(1)
 
 
 """
