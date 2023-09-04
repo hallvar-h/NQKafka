@@ -44,12 +44,20 @@ class KafkaConsumer:
     def __next__(self):
         
         # msg = self.input_queue.get()
-        self.offset, msg = self.input_stream.get()
-        self.recv_event.set()
-        # self.input_stream.put(self.offset)
+        try:
+            self.offset, msg = self.input_stream.get()
+            self.recv_event.set()
+            # self.input_stream.put(self.offset)
+            # server_closed = False
+
+            kafka_msg = type('KafkaMsg', (), {'value': msg})
+            return kafka_msg  # self.offset]
+        except ConnectionResetError:
+            # This means that server has stopped
+            server_closed = True
         
-        kafka_msg = type('KafkaMsg', (), {'value': msg})
-        return kafka_msg  # self.offset]
+        if server_closed:
+            raise StopIteration
        
         # topic_offset = self.offset_dict.get(self.topic)
 

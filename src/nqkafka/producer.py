@@ -15,7 +15,11 @@ class KafkaProducer:
         # self.init_queue.put('producer', self.output_stream)
 
     def send(self, topic, msg):
-        self.producer_queue.put([topic, msg])
+        try:
+            self.producer_queue.put([topic, msg])
+        except ConnectionResetError:
+            # This means that server has stopped
+            pass
 
 
     def flush(self):
