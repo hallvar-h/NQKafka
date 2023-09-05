@@ -43,13 +43,21 @@ class MyManager:
 
     def connect(self, timeout=10):
         t_0 = time.time()
+        connection_successful = False
         while time.time() - t_0 < timeout:
             try:
-                print('Trying to connect...')
+                # print('Trying to connect')
                 self._manager.connect()
-            except:
-                print('Server not found, trying again...')
+                # print('Connected')
+                connection_successful = True
+                break
+                
+            except ConnectionRefusedError:
+                # print('Server not found, trying again...')
                 time.sleep(1)
+        
+        if not connection_successful:
+            raise ConnectionRefusedError('Could not connect to server, aborting.')
 
 
 """

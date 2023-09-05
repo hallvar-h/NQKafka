@@ -8,7 +8,7 @@ from nqkafka.mymanager import MyManager
 
 class MyManagerMod(MyManager):
     def start(self):
-        time.sleep(10)
+        time.sleep(3)
         s = self._manager.get_server()
         s.serve_forever()
 
@@ -25,15 +25,19 @@ def run_server(bootstrap_servers):
     server.start()
 
 
-if __name__ == '__main__':
-    bootstrap_servers = 'localhost:40001'
+def test():
+    bootstrap_servers = 'localhost:40006'
 
     n_msgs = 20
     run_server(bootstrap_servers)
     # create_topic('time', bootstrap_servers=bootstrap_servers, n_samples=50)
 
-    input('Press a key to stop server')
+    time.sleep(10)
 
     stop_server(bootstrap_servers)
 
-    sys.exit()
+    # sys.exit()
+
+
+if __name__ == '__main__':
+    test()

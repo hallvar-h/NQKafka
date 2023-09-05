@@ -36,8 +36,8 @@ def run_producer(bootstrap_servers, n_msgs):
 
 
 
-if __name__ == '__main__':
-    bootstrap_servers = 'localhost:40001'
+def test():
+    bootstrap_servers = 'localhost:40005'
 
     n_msgs = 20
     run_server(bootstrap_servers)
@@ -51,4 +51,8 @@ if __name__ == '__main__':
 
     stop_server(bootstrap_servers)
 
-    sys.exit()
+    # sys.exit()
+
+
+if __name__ == '__main__':
+    test()

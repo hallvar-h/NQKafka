@@ -45,8 +45,8 @@ def run_producer(topic, bootstrap_servers, n_msgs):
 
 
 
-if __name__ == '__main__':
-    bootstrap_servers = 'localhost:40001'
+def test():
+    bootstrap_servers = 'localhost:40002'
 
     n_msgs = 50
     n_topics = 10
@@ -90,4 +90,8 @@ if __name__ == '__main__':
     stop_server(bootstrap_servers)
     print('Server successfully closed.')
 
-    sys.exit()
+    # sys.exit()
+
+
+if __name__ == '__main__':
+    test()

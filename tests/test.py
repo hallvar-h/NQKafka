@@ -45,8 +45,8 @@ def run_producer(bootstrap_servers, n_msgs):
 
 
 
-if __name__ == '__main__':
-    bootstrap_servers = 'localhost:40001'
+def test():
+    bootstrap_servers = 'localhost:40007'
 
     n_msgs = 20
     run_server(bootstrap_servers)

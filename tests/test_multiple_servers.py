@@ -45,11 +45,11 @@ def run_producer(bootstrap_servers, n_msgs):
 
 
 
-if __name__ == '__main__':
+def test():
     n_msgs = 20
     p_consumers = []
     p_producers = []
-    servers = ['localhost:40001', 'localhost:40002']
+    servers = ['localhost:40003', 'localhost:40004']
     for bootstrap_servers in servers:
         run_server(bootstrap_servers)
         
@@ -75,4 +75,8 @@ if __name__ == '__main__':
     for bootstrap_servers in servers:
         stop_server(bootstrap_servers)
 
-    sys.exit()
+    # sys.exit()
+
+
+if __name__ == '__main__':
+    test()
