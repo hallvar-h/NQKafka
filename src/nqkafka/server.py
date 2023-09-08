@@ -134,6 +134,7 @@ class NQKafkaServer:
                 consumer_recv_event.wait()
                 consumer_offset += 1
             except ConnectionResetError:
+                print('NQKAFKA SERVER: Server is trying to stop.')
                 pass
 
     def msg_listener(self):

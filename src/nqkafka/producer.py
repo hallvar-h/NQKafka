@@ -19,6 +19,7 @@ class KafkaProducer:
             self.producer_queue.put([topic, msg])
         except ConnectionResetError:
             # This means that server has stopped
+            print('NQKAFKA PRODUCER: Server is stopping, but producer has not stopped.')
             pass
 
 
