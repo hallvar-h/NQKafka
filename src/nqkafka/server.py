@@ -129,11 +129,12 @@ class NQKafkaServer:
             #     msg = self.shared_dict.get(self.topic)[idx - 1]
             # else:
             # print(msg)
-            
-            consumer_queue.put([consumer_offset + 1, msg])  # self.offset]
-
-            consumer_recv_event.wait()
-            consumer_offset += 1
+            try:
+                consumer_queue.put([consumer_offset + 1, msg])  # self.offset]
+                consumer_recv_event.wait()
+                consumer_offset += 1
+            except ConnectionResetError:
+                pass
 
     def msg_listener(self):
         print('Start listening for messages.')

@@ -13,26 +13,17 @@ def run_server(bootstrap_servers):
 
 def run_consumer(bootstrap_servers, n_msgs):
     kafka_consumer = KafkaConsumer('time', bootstrap_servers=bootstrap_servers, mode='from_beginning')
-
-    k = 0
-    msg_gen = iter(kafka_consumer)
-    while k < n_msgs:
-        msg = next(msg_gen)
-        t_send, k_prod, payload = msg.value
-        if not k == k_prod:
-            print('Wrong message received!')
-        else:
-            sys.stdout.write('\rCorrect message received (#{}). Delay: {:.1f} ms.'.format(k, 1e3*(time.time() - t_send)))
-        k += 1
-
-    print('\nCONSUMER: All messages received')
+    for msg in kafka_consumer:
+        print(msg)
+    # msg_gen = iter(kafka_consumer)
+    # msg = next(msg_gen)
 
 
 def run_producer(bootstrap_servers, n_msgs):
     kafka_producer = KafkaProducer(bootstrap_servers=bootstrap_servers)  # 'localhost:9092')
 
     k = 0
-    while k < n_msgs:
+    while True:  # k < n_msgs:
         time.sleep(0.1)
 
         payload = [1, 2, 3]
@@ -43,10 +34,14 @@ def run_producer(bootstrap_servers, n_msgs):
     print('\nPRODUCER: All messages sent')
 
 
-
+def run_consumer(bootstrap_servers, n_msgs):
+    kafka_consumer = KafkaConsumer('time', bootstrap_servers=bootstrap_servers, mode='from_beginning')
+    for msg in kafka_consumer:
+        print(msg)
+        
 
 def test():
-    bootstrap_servers = 'localhost:40007'
+    bootstrap_servers = 'localhost:40005'
 
     n_msgs = 20
     run_server(bootstrap_servers)
@@ -56,16 +51,16 @@ def test():
 
     p_consumer = mp.Process(target=run_consumer, args=(bootstrap_servers, n_msgs,))
     p_consumer.start()
-
+    # time.sleep(2)
+    
     p_producer = mp.Process(target=run_producer, args=(bootstrap_servers, n_msgs,))
     p_producer.start()
-
-    p_consumer.join()
-    p_producer.join()
+    time.sleep(2)
 
     stop_server(bootstrap_servers)
 
     # sys.exit()
+
 
 if __name__ == '__main__':
     test()
