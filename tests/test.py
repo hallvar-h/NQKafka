@@ -66,3 +66,7 @@ def test():
     stop_server(bootstrap_servers)
 
     sys.exit()
+
+
+if __name__ == '__main__':
+    test()

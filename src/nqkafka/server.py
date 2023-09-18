@@ -2,6 +2,8 @@ from .mymanager import MyManager
 import multiprocessing as mp
 import time
 import threading
+import uuid
+import warnings
 
 class NQKafkaServer:
     def __init__(self, bootstrap_servers):
@@ -14,6 +16,7 @@ class NQKafkaServer:
         self.topic_list = []
         self.consumer_thread_notifyers = {}
         self.topic_locks = {}
+        self.consumer_offsets = {}
         
         self.server_process = mp.Process(target=self.start_server, args=(self.ip, self.port,))
 
@@ -31,11 +34,12 @@ class NQKafkaServer:
                 break
             
             if msg[0] == 'consumer':
-                id = msg[1]
+                consumer_uuid = msg[1]
                 topic_name = msg[2]
                 consumer_queue = msg[3]
                 consumer_recv_event = msg[4]
-                mode = msg[5]
+                consumer_ready_for_msg_event = msg[5]
+                mode = msg[6]
 
                 if not topic_name in self.topic_list:
                     print('"{}" is not a registered topic.'.format(topic_name))
@@ -45,16 +49,16 @@ class NQKafkaServer:
                 notifyer_event.clear()
 
                 event_dict = self.consumer_thread_notifyers[topic_name]
-                event_dict.update([(id, notifyer_event)])
+                event_dict.update([(consumer_uuid, notifyer_event)])
 
                 topic_offset = self.offsets[topic_name]
                 if mode == 'from_beginning':
-                    consumer_offset = max(0, topic_offset - self.topic_lengths[topic_name])
+                    self.consumer_offsets[consumer_uuid] = max(0, topic_offset - self.topic_lengths[topic_name])
                 else:
-                    consumer_offset = topic_offset
+                    self.consumer_offsets[consumer_uuid] = topic_offset
                 # self.consumers[topic_name].append((consumer_offset, consumer_queue))
 
-                new_consumer_server_thread = threading.Thread(target=self.serve_consumer, args=(topic_name, consumer_offset, consumer_queue, consumer_recv_event, notifyer_event), daemon=True)
+                new_consumer_server_thread = threading.Thread(target=self.serve_consumer, args=(topic_name, consumer_uuid, consumer_queue, consumer_recv_event, consumer_ready_for_msg_event, notifyer_event), daemon=True)
                 new_consumer_server_thread.start()
                 # self.consumer_servers.append()
 
@@ -95,28 +99,40 @@ class NQKafkaServer:
                 self.topic_list.append(topic_name)
                 self.topic_locks[topic_name] = threading.Lock()
             
+            elif msg[0] == 'consumer_seek_relative_offset':
+                consumer_uuid = msg[1]
+                relative_offset = msg[2]
+                self.consumer_offsets[consumer_uuid] += relative_offset
+                print(self.consumer_offsets)
+
             # self.init_queue.put('Hei')
             # print(new_consumer_msg)
             # break
 
-    def serve_consumer(self, topic_name, consumer_offset, consumer_queue, consumer_recv_event, consumer_event):
+    def serve_consumer(self, topic_name, consumer_uuid, consumer_queue, consumer_recv_event, consumer_ready_for_msg_event, consumer_event):
+        # consumer_offset = self.consumer_offsets[consumer_uuid]
+
         while True:
             keep_waiting = True
             while keep_waiting:
                 with self.topic_locks[topic_name]:
                     topic_offset = self.offsets[topic_name]
-                if consumer_offset >= topic_offset:
+                if self.consumer_offsets[consumer_uuid] >= topic_offset:
                     consumer_event.wait(timeout=None)
                     consumer_event.clear()
                 else:
+                    consumer_ready_for_msg_event.wait(timeout=None)
+                    consumer_ready_for_msg_event.clear()
                     keep_waiting = False
 
             with self.topic_locks[topic_name]:
                 topic_offset = self.offsets[topic_name]
-                idx = consumer_offset - topic_offset + self.topic_lengths[topic_name]
+                idx = self.consumer_offsets[consumer_uuid] - topic_offset + self.topic_lengths[topic_name]
                 # print('idx={}, consumer offset={}, producer offset={}, n_msgs={}'.format(idx, self.offset, topic_offset, self.n_msg_topic))
-                if idx >= self.topic_lengths[topic_name]:
+                if idx >= self.topic_lengths[topic_name] or idx < 0:
                     # print('Error: Index out of range. idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.topic_lengths[topic_name], self.offset, topic_offset, topic_offset))
+                    # warnings.warn('NQKafka serving consumer: Trying to access index out of range.')
+                    print('IndexError: Index out of range.')  #  idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.n_msg_topic, self.offset, topic_offset, topic_offset))
                     msg = None
                 else:
                     try:
@@ -130,10 +146,12 @@ class NQKafkaServer:
             # else:
             # print(msg)
             
-            consumer_queue.put([consumer_offset + 1, msg])  # self.offset]
+            consumer_queue.put([self.consumer_offsets[consumer_uuid] + 1, msg])  # self.offset]
 
             consumer_recv_event.wait()
-            consumer_offset += 1
+            self.consumer_offsets[consumer_uuid] += 1
+            print(self.consumer_offsets)
+
 
     def msg_listener(self):
         print('Start listening for messages.')
