@@ -30,7 +30,7 @@ class NQKafkaServer:
             try:
                 msg = init_queue.get()
             except ConnectionResetError:
-                print('Server closed.')
+                # print('Server closed.')
                 break
             
             if msg[0] == 'consumer':
@@ -101,9 +101,13 @@ class NQKafkaServer:
             
             elif msg[0] == 'consumer_seek_relative_offset':
                 consumer_uuid = msg[1]
-                relative_offset = msg[2]
+                topic = msg[2]
+                relative_offset = msg[3]
                 self.consumer_offsets[consumer_uuid] += relative_offset
-                print(self.consumer_offsets)
+                if self.consumer_offsets[consumer_uuid] < 0:
+                    self.consumer_offsets[consumer_uuid] = 0 
+                self.consumer_thread_notifyers[topic][consumer_uuid].set()  # In case server is waiting on this event (waiting for new messages)
+                # print(self.consumer_offsets)
 
             # self.init_queue.put('Hei')
             # print(new_consumer_msg)
@@ -112,18 +116,24 @@ class NQKafkaServer:
     def serve_consumer(self, topic_name, consumer_uuid, consumer_queue, consumer_recv_event, consumer_ready_for_msg_event, consumer_event):
         # consumer_offset = self.consumer_offsets[consumer_uuid]
 
+        server_closing = False
         while True:
             keep_waiting = True
             while keep_waiting:
                 with self.topic_locks[topic_name]:
                     topic_offset = self.offsets[topic_name]
                 if self.consumer_offsets[consumer_uuid] >= topic_offset:
-                    consumer_event.wait(timeout=None)
+                    consumer_event.wait(timeout=None)  # Waiting for new messages
                     consumer_event.clear()
                 else:
-                    consumer_ready_for_msg_event.wait(timeout=None)
-                    consumer_ready_for_msg_event.clear()
-                    keep_waiting = False
+                    try:
+                        consumer_ready_for_msg_event.wait(timeout=None)
+                        consumer_ready_for_msg_event.clear()
+                        keep_waiting = False
+                    except ConnectionResetError:
+                        # print('Server closing, aborting serve_consumer thread')
+                        return
+                        
 
             with self.topic_locks[topic_name]:
                 topic_offset = self.offsets[topic_name]
@@ -150,7 +160,7 @@ class NQKafkaServer:
 
             consumer_recv_event.wait()
             self.consumer_offsets[consumer_uuid] += 1
-            print(self.consumer_offsets)
+            # print(self.consumer_offsets)
 
 
     def msg_listener(self):
@@ -162,7 +172,7 @@ class NQKafkaServer:
                 topic, msg = msg_queue.get()
                 
             except ConnectionResetError:
-                print('Server closed.')
+                # print('Server closed.')
                 break
             
             # self.init_queue.put('Hei')

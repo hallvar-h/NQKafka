@@ -4,7 +4,7 @@ from multiprocessing.managers import dispatch, listener_client
 
 
 def consumer_seek_relative_offset(consumer, relative_offset):
-    consumer.init_queue.put(['consumer_seek_relative_offset', consumer.id, relative_offset])
+    consumer.init_queue.put(['consumer_seek_relative_offset', consumer.id, consumer.topic, relative_offset])
     # consumer.offset += relative_offset
 
 

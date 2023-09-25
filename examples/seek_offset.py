@@ -38,14 +38,25 @@ if __name__ == '__main__':
     run_producer(bootstrap_servers, n_msgs)
     
     kafka_consumer = KafkaConsumer('time', bootstrap_servers=bootstrap_servers)
-    consumer_seek_relative_offset(kafka_consumer, -2)
+    consumer_seek_relative_offset(kafka_consumer, -10)
     msg = next(iter(kafka_consumer))
-    msg.value
+    print(msg.value)
 
-    
-    
+    for _ in range(3):
+        print(next(iter(kafka_consumer)).value)
 
-if False:
+    consumer_seek_relative_offset(kafka_consumer, -3)
+
+    for _ in range(3):
+        print(next(iter(kafka_consumer)).value)
+
+    consumer_seek_relative_offset(kafka_consumer, 1)
+
+    for _ in range(2):
+        print(next(iter(kafka_consumer)).value)
+
+
+    time.sleep(2)
     stop_server(bootstrap_servers)
 
     sys.exit()
