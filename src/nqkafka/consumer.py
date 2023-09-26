@@ -55,7 +55,7 @@ class KafkaConsumer:
 
             kafka_msg = type('KafkaMsg', (), {'value': msg})
             return kafka_msg  # self.offset]
-        except ConnectionResetError:
+        except (EOFError, ConnectionResetError, BrokenPipeError) as e:
             # This means that server has stopped
             server_closed = True
         

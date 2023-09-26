@@ -29,7 +29,8 @@ class NQKafkaServer:
             #print('Waiting for consumers...')
             try:
                 msg = init_queue.get()
-            except ConnectionResetError:
+            except (Exception, ConnectionResetError) as e:
+                print(e)
                 # print('Server closed.')
                 break
             
@@ -164,14 +165,15 @@ class NQKafkaServer:
 
 
     def msg_listener(self):
-        print('Start listening for messages.')
+        # print('Start listening for messages.')
         msg_queue = self.manager.get_producer_queue()
         while True:
             # print('Waiting for messages...')
             try:
                 topic, msg = msg_queue.get()
                 
-            except ConnectionResetError:
+            except (Exception, ConnectionResetError) as e:
+                print(e)
                 # print('Server closed.')
                 break
             
@@ -199,11 +201,12 @@ class NQKafkaServer:
 
     def start(self):
         self.server_process.start()
-        time.sleep(2)
         self.manager = MyManager(address=(self.ip, self.port))  # , authkey=b'supersecretauthkey')
         self.manager.connect()  
 
         self.consumer_listener_thread.start()
         self.msg_listener_thread.start()
+
+        print('NQKafka server started.')
 
         

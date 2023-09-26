@@ -63,7 +63,7 @@ def test():
     p_producers = {}
     
 
-    time.sleep(1)
+    # time.sleep(1)
 
     for topic in topics:
         p_consumers[topic] = []

@@ -52,7 +52,7 @@ def test():
     run_server(bootstrap_servers)
 
     create_topic('time', bootstrap_servers=bootstrap_servers, n_samples=50)
-    time.sleep(2)
+    time.sleep(5)
 
     p_consumer = mp.Process(target=run_consumer, args=(bootstrap_servers, n_msgs,))
     p_consumer.start()

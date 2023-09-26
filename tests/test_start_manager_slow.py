@@ -6,11 +6,17 @@ import sys
 import time
 from nqkafka.mymanager import MyManager
 
+class MyManagerMod(MyManager):
+    def start(self):
+        time.sleep(3)
+        s = self._manager.get_server()
+        s.serve_forever()
+
+
 class NQKafkaServerMod(NQKafkaServer):
     @staticmethod
     def start_server(ip, port):
-        time.sleep(4)
-        manager = MyManager(server=True, address=(ip, port))
+        manager = MyManagerMod(server=True, address=(ip, port))
         manager.start()
 
 
@@ -20,11 +26,11 @@ def run_server(bootstrap_servers):
 
 
 def test():
-    bootstrap_servers = 'localhost:40006'
+    bootstrap_servers = 'localhost:40016'
 
     n_msgs = 20
     run_server(bootstrap_servers)
-    create_topic('time', bootstrap_servers=bootstrap_servers, n_samples=50)
+    # create_topic('time', bootstrap_servers=bootstrap_servers, n_samples=50)
 
     time.sleep(5)
 

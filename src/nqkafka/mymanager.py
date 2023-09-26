@@ -38,7 +38,7 @@ class MyManager:
 
     def start(self):
         s = self._manager.get_server()
-        print('Serving forever...')
+        # print('Serving forever...')
         s.serve_forever()
 
     def connect(self, timeout=10):

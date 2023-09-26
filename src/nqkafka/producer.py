@@ -17,7 +17,8 @@ class KafkaProducer:
     def send(self, topic, msg):
         try:
             self.producer_queue.put([topic, msg])
-        except ConnectionResetError:
+        except (EOFError, ConnectionResetError, BrokenPipeError) as e:
+            # print(e)
             # This means that server has stopped
             pass
 
