@@ -30,7 +30,7 @@ class NQKafkaServer:
             try:
                 msg = init_queue.get()
             except (Exception, ConnectionResetError) as e:
-                print(e)
+                # print(e)
                 # print('Server closed.')
                 break
             
@@ -173,7 +173,7 @@ class NQKafkaServer:
                 topic, msg = msg_queue.get()
                 
             except (Exception, ConnectionResetError) as e:
-                print(e)
+                # print(e)
                 # print('Server closed.')
                 break
             
