@@ -44,7 +44,7 @@ class NQKafkaServer:
 
                 if not topic_name in self.topic_list:
                     print('"{}" is not a registered topic.'.format(topic_name))
-                    break
+                    continue
 
                 notifyer_event = threading.Event()
                 notifyer_event.clear()
