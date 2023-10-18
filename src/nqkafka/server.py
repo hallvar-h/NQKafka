@@ -143,13 +143,16 @@ class NQKafkaServer:
                 if idx >= self.topic_lengths[topic_name] or idx < 0:
                     # print('Error: Index out of range. idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.topic_lengths[topic_name], self.offset, topic_offset, topic_offset))
                     # warnings.warn('NQKafka serving consumer: Trying to access index out of range.')
-                    print('IndexError: Index out of range.')  #  idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.n_msg_topic, self.offset, topic_offset, topic_offset))
-                    msg = None
+                    print('Warning: Index out of range. Forwarding offset.')  #  idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.n_msg_topic, self.offset, topic_offset, topic_offset))
+                    msg = self.data[topic_name][0]
+                    self.consumer_offsets[consumer_uuid] = topic_offset + self.topic_lengths[topic_name]                      
+                    # msg = None
                 else:
                     try:
                         msg = self.data[topic_name][idx]  # .copy()
                     except IndexError:
                         print('IndexError: Index out of range.')  #  idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.n_msg_topic, self.offset, topic_offset, topic_offset))
+
 
             # if idx >= self.n_msg_topic:
             #     print(idx, self.offset, self.offset_dict.get(self.topic), self.n_msg_topic)
