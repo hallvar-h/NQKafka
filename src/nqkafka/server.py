@@ -145,7 +145,7 @@ class NQKafkaServer:
                     # warnings.warn('NQKafka serving consumer: Trying to access index out of range.')
                     print('Warning: Index out of range. Forwarding offset.')  #  idx={}, n_msgs={}, consumer offset={}, topic offset={}'.format(idx, self.n_msg_topic, self.offset, topic_offset, topic_offset))
                     msg = self.data[topic_name][0]
-                    self.consumer_offsets[consumer_uuid] = topic_offset + self.topic_lengths[topic_name]                      
+                    self.consumer_offsets[consumer_uuid] = topic_offset - self.topic_lengths[topic_name]
                     # msg = None
                 else:
                     try:

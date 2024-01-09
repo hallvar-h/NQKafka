@@ -55,6 +55,12 @@ if __name__ == '__main__':
     for _ in range(2):
         print(next(iter(kafka_consumer)).value)
 
+    import numpy as np
+    consumer_seek_relative_offset(kafka_consumer, -np.inf)
+
+    for _ in range(5):
+        print(next(iter(kafka_consumer)).value)
+
 
     time.sleep(2)
     stop_server(bootstrap_servers)
