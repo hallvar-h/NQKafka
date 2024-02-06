@@ -3,6 +3,9 @@ import uuid
 from multiprocessing.managers import SyncManager
 import sys
 
+class NQKafkaMessage:
+    def __init__(self, key=None, value=None):
+        self.value = value
 
 class KafkaConsumer:
     def __init__(self, topic, bootstrap_servers, value_deserializer=None, mode='not_from_beginning', *args, **kwargs):
@@ -53,8 +56,9 @@ class KafkaConsumer:
             # self.input_stream.put(self.offset)
             # server_closed = False
 
-            kafka_msg = type('KafkaMsg', (), {'value': msg})
-            return kafka_msg  # self.offset]
+            nqkafka_msg = NQKafkaMessage(value=msg)
+
+            return nqkafka_msg  # self.offset]
         except (EOFError, ConnectionResetError, BrokenPipeError) as e:
             # This means that server has stopped
             server_closed = True
