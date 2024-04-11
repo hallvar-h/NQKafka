@@ -12,7 +12,7 @@ def run_server(bootstrap_servers):
 
 
 def test():
-    bootstrap_servers = 'localhost:40007'
+    bootstrap_servers = 'localhost:40020'
 
     n_msgs = 20
     run_server(bootstrap_servers)

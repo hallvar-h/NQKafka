@@ -6,7 +6,7 @@ import uuid
 import warnings
 
 class NQKafkaServer:
-    def __init__(self, bootstrap_servers):
+    def __init__(self, bootstrap_servers, run_in_process=True):
         self.ip, port_str = bootstrap_servers.split(':')
         self.port = int(port_str)
         self.data = {}
@@ -18,7 +18,8 @@ class NQKafkaServer:
         self.topic_locks = {}
         self.consumer_offsets = {}
         
-        self.server_process = mp.Process(target=self.start_server, args=(self.ip, self.port,))
+        process_or_thread = mp.Process if run_in_process else threading.Thread
+        self.server_process = process_or_thread(target=self.start_server, args=(self.ip, self.port,))
 
         self.consumer_listener_thread = threading.Thread(target=self.consumer_listener, daemon=True)
         self.msg_listener_thread = threading.Thread(target=self.msg_listener, daemon=True)
