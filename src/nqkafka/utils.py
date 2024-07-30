@@ -29,7 +29,7 @@ def stop_server(bootstrap_servers, authkey=b'supersecretauthkey'):
     conn = _Client(address=(ip, port), authkey=authkey)
     dispatch(conn, None, 'shutdown')
     conn.close()
-    print('NQKafka server closed.')
+    # print('NQKafka server closed.')
 
 
 def get_last_message_from_topic(bootstrap_servers, topic):
