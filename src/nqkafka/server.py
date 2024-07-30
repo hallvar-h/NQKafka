@@ -89,7 +89,7 @@ class NQKafkaServer:
             elif msg[0] == 'new_topic':
                 topic_name = msg[1]
                 n_samples = msg[2]
-                print(f'New topic: {topic_name}')
+                # print(f'New topic: {topic_name}')
                 data_list = []
                 for _ in range(n_samples):
                     data_list.append(None)
@@ -211,6 +211,6 @@ class NQKafkaServer:
         self.consumer_listener_thread.start()
         self.msg_listener_thread.start()
 
-        print('NQKafka server started.')
+        # print('NQKafka server started.')
 
         
